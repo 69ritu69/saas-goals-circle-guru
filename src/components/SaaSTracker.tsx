@@ -13,46 +13,134 @@ interface SaaSData {
   goalUsers: number;
 }
 
-const CircularProgress = ({ progress, size = 120 }: { progress: number; size?: number }) => {
-  const radius = (size - 8) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+const RadialProgress = ({ progress, size = 200 }: { progress: number; size?: number }) => {
+  const center = size / 2;
+  const segments = 12; // Number of radial segments
+  const rings = 5; // Number of concentric rings
+  const maxRadius = center - 20;
+  const minRadius = 30;
+  
+  // Calculate how many segments should be filled based on progress
+  const totalCells = segments * rings;
+  const filledCells = Math.floor((progress / 100) * totalCells);
+  
+  const renderRadialGrid = () => {
+    const elements = [];
+    
+    // Create concentric rings and radial lines
+    for (let ring = 0; ring < rings; ring++) {
+      const radius = minRadius + (ring * (maxRadius - minRadius)) / (rings - 1);
+      
+      for (let segment = 0; segment < segments; segment++) {
+        const angle = (segment * 360) / segments;
+        const cellIndex = ring * segments + segment;
+        const isFilled = cellIndex < filledCells;
+        
+        // Create radial segment path
+        const startAngle = (angle - 360 / segments / 2) * Math.PI / 180;
+        const endAngle = (angle + 360 / segments / 2) * Math.PI / 180;
+        const innerR = ring === 0 ? minRadius : minRadius + ((ring - 1) * (maxRadius - minRadius)) / (rings - 1);
+        const outerR = radius;
+        
+        const x1 = center + innerR * Math.cos(startAngle);
+        const y1 = center + innerR * Math.sin(startAngle);
+        const x2 = center + outerR * Math.cos(startAngle);
+        const y2 = center + outerR * Math.sin(startAngle);
+        const x3 = center + outerR * Math.cos(endAngle);
+        const y3 = center + outerR * Math.sin(endAngle);
+        const x4 = center + innerR * Math.cos(endAngle);
+        const y4 = center + innerR * Math.sin(endAngle);
+        
+        const pathData = `M ${x1} ${y1} L ${x2} ${y2} A ${outerR} ${outerR} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${innerR} ${innerR} 0 0 0 ${x1} ${y1}`;
+        
+        elements.push(
+          <path
+            key={`segment-${ring}-${segment}`}
+            d={pathData}
+            fill={isFilled ? `url(#radialGradient-${cellIndex})` : "hsl(var(--border))"}
+            stroke="hsl(var(--background))"
+            strokeWidth="1"
+            className={`transition-all duration-300 ${isFilled ? 'animate-pulse-slow' : ''}`}
+            style={{
+              animationDelay: `${cellIndex * 50}ms`
+            }}
+          />
+        );
+      }
+    }
+    
+    // Add radial lines
+    for (let i = 0; i < segments; i++) {
+      const angle = (i * 360) / segments * Math.PI / 180;
+      const x1 = center + minRadius * Math.cos(angle);
+      const y1 = center + minRadius * Math.sin(angle);
+      const x2 = center + maxRadius * Math.cos(angle);
+      const y2 = center + maxRadius * Math.sin(angle);
+      
+      elements.push(
+        <line
+          key={`radial-${i}`}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke="hsl(var(--border))"
+          strokeWidth="1"
+          opacity="0.5"
+        />
+      );
+    }
+    
+    // Add concentric circles
+    for (let i = 0; i < rings; i++) {
+      const radius = minRadius + (i * (maxRadius - minRadius)) / (rings - 1);
+      elements.push(
+        <circle
+          key={`ring-${i}`}
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="hsl(var(--border))"
+          strokeWidth="1"
+          opacity="0.5"
+        />
+      );
+    }
+    
+    return elements;
+  };
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} className="transform -rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="hsl(var(--border))"
-          strokeWidth="4"
-          fill="transparent"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="url(#gradient)"
-          strokeWidth="4"
-          fill="transparent"
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          className="transition-all duration-1000 ease-out"
-        />
+      <svg width={size} height={size} className="overflow-visible">
         <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--accent))" />
-          </linearGradient>
+          {/* Create multiple gradients for different segments */}
+          {Array.from({ length: totalCells }, (_, i) => (
+            <radialGradient key={i} id={`radialGradient-${i}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="hsl(var(--primary))" opacity="0.8" />
+              <stop offset="50%" stopColor="hsl(var(--accent))" opacity="0.6" />
+              <stop offset="100%" stopColor="hsl(var(--primary))" opacity="0.9" />
+            </radialGradient>
+          ))}
+          
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
+        
+        {renderRadialGrid()}
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+      
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
           {Math.round(progress)}%
         </span>
+        <span className="text-xs text-muted-foreground mt-1">Progress</span>
       </div>
     </div>
   );
@@ -200,7 +288,7 @@ export const SaaSTracker = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex justify-center">
-                <CircularProgress progress={Math.min(progress, 100)} size={140} />
+                <RadialProgress progress={Math.min(progress, 100)} size={240} />
               </div>
               
               <div className="space-y-4">
