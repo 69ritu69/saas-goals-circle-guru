@@ -4,13 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Share } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Copy, Share, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MetricCard } from "./MetricCard";
+import { GrowthChart } from "./GrowthChart";
+import { InsightsPanel } from "./InsightsPanel";
 
 interface SaaSData {
   name: string;
   currentUsers: number;
   goalUsers: number;
+  monthlyRevenue: number;
+  revenueGoal: number;
+  churnRate: number;
+  growthRate: number;
+  historicalData: Array<{
+    month: string;
+    users: number;
+    revenue: number;
+  }>;
 }
 
 const RadialProgress = ({ progress, size = 200 }: { progress: number; size?: number }) => {
@@ -151,11 +164,24 @@ export const SaaSTracker = () => {
     name: "",
     currentUsers: 0,
     goalUsers: 1000,
+    monthlyRevenue: 0,
+    revenueGoal: 10000,
+    churnRate: 5,
+    growthRate: 10,
+    historicalData: [
+      { month: "Jan", users: 100, revenue: 500 },
+      { month: "Feb", users: 150, revenue: 750 },
+      { month: "Mar", users: 220, revenue: 1100 },
+      { month: "Apr", users: 300, revenue: 1500 },
+      { month: "May", users: 400, revenue: 2000 },
+      { month: "Jun", users: 520, revenue: 2600 },
+    ],
   });
   const [isEditing, setIsEditing] = useState(true);
   const { toast } = useToast();
 
   const progress = saasData.goalUsers > 0 ? (saasData.currentUsers / saasData.goalUsers) * 100 : 0;
+  const revenueProgress = saasData.revenueGoal > 0 ? (saasData.monthlyRevenue / saasData.revenueGoal) * 100 : 0;
 
   const handleSave = () => {
     if (saasData.name.trim()) {
@@ -168,17 +194,17 @@ export const SaaSTracker = () => {
   };
 
   const handleCopy = () => {
-    const shareText = `🚀 ${saasData.name} Progress Update!\n\n📊 Current Users: ${saasData.currentUsers.toLocaleString()}\n🎯 Goal: ${saasData.goalUsers.toLocaleString()} users\n📈 Progress: ${Math.round(progress)}%\n\n#SaaS #Growth #Startup`;
+    const shareText = `🚀 ${saasData.name} Progress Update!\n\n📊 Users: ${saasData.currentUsers.toLocaleString()}/${saasData.goalUsers.toLocaleString()} (${Math.round(progress)}%)\n💰 Revenue: $${saasData.monthlyRevenue.toLocaleString()}/$${saasData.revenueGoal.toLocaleString()} (${Math.round(revenueProgress)}%)\n📈 Growth Rate: ${saasData.growthRate}%/month\n📉 Churn Rate: ${saasData.churnRate}%\n\n#SaaS #Growth #Startup #Metrics`;
     
     navigator.clipboard.writeText(shareText);
     toast({
       title: "Copied to clipboard!",
-      description: "Share your progress on social media.",
+      description: "Share your comprehensive progress on social media.",
     });
   };
 
   const handleShare = async () => {
-    const shareText = `🚀 ${saasData.name} Progress Update!\n\n📊 Current Users: ${saasData.currentUsers.toLocaleString()}\n🎯 Goal: ${saasData.goalUsers.toLocaleString()} users\n📈 Progress: ${Math.round(progress)}%\n\n#SaaS #Growth #Startup`;
+    const shareText = `🚀 ${saasData.name} Progress Update!\n\n📊 Users: ${saasData.currentUsers.toLocaleString()}/${saasData.goalUsers.toLocaleString()} (${Math.round(progress)}%)\n💰 Revenue: $${saasData.monthlyRevenue.toLocaleString()}/$${saasData.revenueGoal.toLocaleString()} (${Math.round(revenueProgress)}%)\n📈 Growth Rate: ${saasData.growthRate}%/month\n📉 Churn Rate: ${saasData.churnRate}%\n\n#SaaS #Growth #Startup #Metrics`;
     
     if (navigator.share) {
       try {
@@ -208,114 +234,265 @@ export const SaaSTracker = () => {
         </div>
 
         {/* Main Dashboard */}
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Setup Card */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                SaaS Details
-                {!isEditing && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Key Metrics Grid */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <MetricCard
+                title="Monthly Active Users"
+                current={saasData.currentUsers}
+                goal={saasData.goalUsers}
+                trend={saasData.growthRate}
+              />
+              <MetricCard
+                title="Monthly Revenue"
+                current={saasData.monthlyRevenue}
+                goal={saasData.revenueGoal}
+                prefix="$"
+                trend={15}
+                color="success"
+              />
+              <MetricCard
+                title="Churn Rate"
+                current={saasData.churnRate}
+                goal={2}
+                suffix="%"
+                trend={-2}
+                color="destructive"
+              />
+              <MetricCard
+                title="Growth Rate"
+                current={saasData.growthRate}
+                goal={20}
+                suffix="%"
+                trend={5}
+                color="primary"
+              />
+            </div>
+
+            {/* Progress Visualization */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>User Progress Visualization</CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <RadialProgress progress={Math.min(progress, 100)} size={240} />
+                </CardContent>
+              </Card>
+
+              <InsightsPanel data={saasData} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="metrics" className="space-y-6">
+            {/* Detailed Metrics */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>User Metrics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4">
+                    <MetricCard
+                      title="Daily Active Users"
+                      current={Math.floor(saasData.currentUsers * 0.3)}
+                      goal={Math.floor(saasData.goalUsers * 0.3)}
+                      trend={8}
+                    />
+                    <MetricCard
+                      title="Weekly Active Users"
+                      current={Math.floor(saasData.currentUsers * 0.7)}
+                      goal={Math.floor(saasData.goalUsers * 0.7)}
+                      trend={12}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Revenue Metrics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4">
+                    <MetricCard
+                      title="Average Revenue Per User"
+                      current={saasData.currentUsers > 0 ? Math.floor(saasData.monthlyRevenue / saasData.currentUsers) : 0}
+                      goal={50}
+                      prefix="$"
+                      trend={10}
+                      color="success"
+                    />
+                    <MetricCard
+                      title="Lifetime Value"
+                      current={saasData.currentUsers > 0 ? Math.floor((saasData.monthlyRevenue / saasData.currentUsers) * 12) : 0}
+                      goal={600}
+                      prefix="$"
+                      trend={15}
+                      color="success"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <GrowthChart data={saasData.historicalData} />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            {/* Setup Card */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  SaaS Configuration
+                  {!isEditing && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="saas-name">SaaS Name</Label>
+                    <Input
+                      id="saas-name"
+                      placeholder="Enter your SaaS name"
+                      value={saasData.name}
+                      onChange={(e) =>
+                        setSaasData({ ...saasData, name: e.target.value })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="current-users">Current Monthly Active Users</Label>
+                    <Input
+                      id="current-users"
+                      type="number"
+                      placeholder="0"
+                      value={saasData.currentUsers}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          currentUsers: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="goal-users">User Goal</Label>
+                    <Input
+                      id="goal-users"
+                      type="number"
+                      placeholder="1000"
+                      value={saasData.goalUsers}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          goalUsers: parseInt(e.target.value) || 1000,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="monthly-revenue">Monthly Revenue ($)</Label>
+                    <Input
+                      id="monthly-revenue"
+                      type="number"
+                      placeholder="0"
+                      value={saasData.monthlyRevenue}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          monthlyRevenue: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="revenue-goal">Revenue Goal ($)</Label>
+                    <Input
+                      id="revenue-goal"
+                      type="number"
+                      placeholder="10000"
+                      value={saasData.revenueGoal}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          revenueGoal: parseInt(e.target.value) || 10000,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="churn-rate">Churn Rate (%)</Label>
+                    <Input
+                      id="churn-rate"
+                      type="number"
+                      placeholder="5"
+                      value={saasData.churnRate}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          churnRate: parseInt(e.target.value) || 5,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="growth-rate">Growth Rate (%/month)</Label>
+                    <Input
+                      id="growth-rate"
+                      type="number"
+                      placeholder="10"
+                      value={saasData.growthRate}
+                      onChange={(e) =>
+                        setSaasData({
+                          ...saasData,
+                          growthRate: parseInt(e.target.value) || 10,
+                        })
+                      }
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
+
+                {isEditing && (
+                  <Button onClick={handleSave} className="w-full">
+                    Save Configuration
                   </Button>
                 )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="saas-name">SaaS Name</Label>
-                <Input
-                  id="saas-name"
-                  placeholder="Enter your SaaS name"
-                  value={saasData.name}
-                  onChange={(e) =>
-                    setSaasData({ ...saasData, name: e.target.value })
-                  }
-                  disabled={!isEditing}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="current-users">Current Monthly Active Users</Label>
-                <Input
-                  id="current-users"
-                  type="number"
-                  placeholder="0"
-                  value={saasData.currentUsers}
-                  onChange={(e) =>
-                    setSaasData({
-                      ...saasData,
-                      currentUsers: parseInt(e.target.value) || 0,
-                    })
-                  }
-                  disabled={!isEditing}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="goal-users">Goal Users</Label>
-                <Input
-                  id="goal-users"
-                  type="number"
-                  placeholder="1000"
-                  value={saasData.goalUsers}
-                  onChange={(e) =>
-                    setSaasData({
-                      ...saasData,
-                      goalUsers: parseInt(e.target.value) || 1000,
-                    })
-                  }
-                  disabled={!isEditing}
-                />
-              </div>
-
-              {isEditing && (
-                <Button onClick={handleSave} className="w-full">
-                  Save Details
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Progress Card */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Progress Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-center">
-                <RadialProgress progress={Math.min(progress, 100)} size={240} />
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Current Users</span>
-                  <Badge variant="secondary" className="text-lg">
-                    {saasData.currentUsers.toLocaleString()}
-                  </Badge>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Goal</span>
-                  <Badge variant="outline" className="text-lg">
-                    {saasData.goalUsers.toLocaleString()}
-                  </Badge>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Remaining</span>
-                  <Badge variant="destructive" className="text-lg">
-                    {Math.max(saasData.goalUsers - saasData.currentUsers, 0).toLocaleString()}
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Share Section */}
         {!isEditing && saasData.name && (
@@ -328,13 +505,15 @@ export const SaaSTracker = () => {
                 <p className="text-sm whitespace-pre-line">
                   🚀 {saasData.name} Progress Update!
                   {"\n\n"}
-                  📊 Current Users: {saasData.currentUsers.toLocaleString()}
+                  📊 Users: {saasData.currentUsers.toLocaleString()}/{saasData.goalUsers.toLocaleString()} ({Math.round(progress)}%)
                   {"\n"}
-                  🎯 Goal: {saasData.goalUsers.toLocaleString()} users
+                  💰 Revenue: ${saasData.monthlyRevenue.toLocaleString()}/${saasData.revenueGoal.toLocaleString()} ({Math.round(revenueProgress)}%)
                   {"\n"}
-                  📈 Progress: {Math.round(progress)}%
+                  📈 Growth Rate: {saasData.growthRate}%/month
+                  {"\n"}
+                  📉 Churn Rate: {saasData.churnRate}%
                   {"\n\n"}
-                  #SaaS #Growth #Startup
+                  #SaaS #Growth #Startup #Metrics
                 </p>
               </div>
               
