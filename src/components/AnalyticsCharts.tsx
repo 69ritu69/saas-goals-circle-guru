@@ -33,22 +33,40 @@ interface AnalyticsChartsProps {
 }
 
 export const AnalyticsCharts = ({ data }: AnalyticsChartsProps) => {
-  // Revenue breakdown data
-  const revenueBreakdown = [
+  // Only show charts if there's historical data
+  if (!data.historicalData || data.historicalData.length === 0) {
+    return (
+      <Card className="bg-gradient-card border-border/50">
+        <CardHeader>
+          <CardTitle>Analytics Dashboard</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-12">
+          <p className="text-muted-foreground mb-4">No historical data available yet.</p>
+          <p className="text-sm text-muted-foreground">
+            Add your SaaS metrics in Settings to see detailed analytics and forecasting.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Revenue breakdown data - based on actual revenue
+  const revenueBreakdown = data.monthlyRevenue > 0 ? [
     { name: 'New Customers', value: Math.floor(data.monthlyRevenue * 0.4), color: 'hsl(var(--primary))' },
     { name: 'Existing Customers', value: Math.floor(data.monthlyRevenue * 0.5), color: 'hsl(var(--success))' },
     { name: 'Upgrades', value: Math.floor(data.monthlyRevenue * 0.1), color: 'hsl(var(--accent))' }
-  ];
+  ] : [];
 
-  // User acquisition funnel
+  // User acquisition funnel - based on actual users
+  const baseVisitors = data.currentUsers > 0 ? data.currentUsers * 10 : 1000;
   const acquisitionFunnel = [
-    { stage: 'Visitors', count: 10000, conversion: 100 },
-    { stage: 'Signups', count: 2000, conversion: 20 },
-    { stage: 'Trial Users', count: 1500, conversion: 15 },
-    { stage: 'Paid Users', count: data.currentUsers, conversion: (data.currentUsers / 10000) * 100 },
+    { stage: 'Visitors', count: baseVisitors, conversion: 100 },
+    { stage: 'Signups', count: Math.floor(baseVisitors * 0.2), conversion: 20 },
+    { stage: 'Trial Users', count: Math.floor(baseVisitors * 0.15), conversion: 15 },
+    { stage: 'Paid Users', count: data.currentUsers, conversion: (data.currentUsers / baseVisitors) * 100 },
   ];
 
-  // Monthly comparison data
+  // Monthly comparison data - only if we have historical data
   const monthlyComparison = data.historicalData.map((item, index) => ({
     ...item,
     previousYear: Math.floor(item.users * 0.7), // Simulated previous year data
@@ -56,29 +74,31 @@ export const AnalyticsCharts = ({ data }: AnalyticsChartsProps) => {
     userGrowth: index > 0 ? ((item.users - data.historicalData[index - 1].users) / data.historicalData[index - 1].users) * 100 : 0
   }));
 
-  // Cohort retention simulation
-  const cohortData = [
-    { month: 'M0', retention: 100 },
-    { month: 'M1', retention: 85 },
-    { month: 'M2', retention: 78 },
-    { month: 'M3', retention: 72 },
-    { month: 'M4', retention: 68 },
-    { month: 'M5', retention: 65 },
-    { month: 'M6', retention: 63 }
-  ];
-
-  // Forecasting data (6 months ahead)
-  const forecastData = [...data.historicalData];
-  for (let i = 1; i <= 6; i++) {
-    const lastMonth = forecastData[forecastData.length - 1];
-    const projectedUsers = Math.floor(lastMonth.users * (1 + data.growthRate / 100));
-    const projectedRevenue = Math.floor(lastMonth.revenue * (1 + (data.growthRate + 5) / 100));
-    
-    forecastData.push({
-      month: `Proj ${i}`,
-      users: projectedUsers,
-      revenue: projectedRevenue
+  // Cohort retention based on actual churn rate
+  const cohortData = [];
+  const monthlyRetention = 100 - data.churnRate;
+  for (let i = 0; i <= 6; i++) {
+    const retention = i === 0 ? 100 : Math.max(monthlyRetention ** i, 30); // Min 30% retention
+    cohortData.push({
+      month: `M${i}`,
+      retention: Math.round(retention * 100) / 100
     });
+  }
+
+  // Forecasting data (6 months ahead) - only if we have historical data
+  const forecastData = [...data.historicalData];
+  if (data.historicalData.length > 0 && data.growthRate > 0) {
+    for (let i = 1; i <= 6; i++) {
+      const lastMonth = forecastData[forecastData.length - 1];
+      const projectedUsers = Math.floor(lastMonth.users * (1 + data.growthRate / 100));
+      const projectedRevenue = Math.floor(lastMonth.revenue * (1 + (data.growthRate + 5) / 100));
+      
+      forecastData.push({
+        month: `Proj ${i}`,
+        users: projectedUsers,
+        revenue: projectedRevenue
+      });
+    }
   }
 
   const CustomTooltip = ({ active, payload, label }: any) => {

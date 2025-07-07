@@ -271,15 +271,15 @@ export const SaaSTracker = () => {
                   <div className="grid gap-4">
                     <MetricCard
                       title="Daily Active Users"
-                      current={Math.floor(saasData.currentUsers * 0.3)}
-                      goal={Math.floor(saasData.goalUsers * 0.3)}
-                      trend={8}
+                      current={Math.floor(saasData.currentUsers * 0.25)}
+                      goal={Math.floor(saasData.goalUsers * 0.25)}
+                      trend={0}
                     />
                     <MetricCard
                       title="Weekly Active Users"
-                      current={Math.floor(saasData.currentUsers * 0.7)}
-                      goal={Math.floor(saasData.goalUsers * 0.7)}
-                      trend={12}
+                      current={Math.floor(saasData.currentUsers * 0.65)}
+                      goal={Math.floor(saasData.goalUsers * 0.65)}
+                      trend={0}
                     />
                   </div>
                 </CardContent>
@@ -296,7 +296,7 @@ export const SaaSTracker = () => {
                       current={saasData.currentUsers > 0 ? Math.floor(saasData.monthlyRevenue / saasData.currentUsers) : 0}
                       goal={50}
                       prefix="$"
-                      trend={10}
+                      trend={0}
                       color="success"
                     />
                     <MetricCard
@@ -304,7 +304,7 @@ export const SaaSTracker = () => {
                       current={saasData.currentUsers > 0 ? Math.floor((saasData.monthlyRevenue / saasData.currentUsers) * 12) : 0}
                       goal={600}
                       prefix="$"
-                      trend={15}
+                      trend={0}
                       color="success"
                     />
                   </div>
