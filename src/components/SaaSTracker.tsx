@@ -10,6 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { MetricCard } from "./MetricCard";
 import { GrowthChart } from "./GrowthChart";
 import { InsightsPanel } from "./InsightsPanel";
+import { ProgressDashboard } from "./ProgressDashboard";
+import { AdvancedMetrics } from "./AdvancedMetrics";
+import { AnalyticsCharts } from "./AnalyticsCharts";
 
 interface SaaSData {
   name: string;
@@ -243,45 +246,14 @@ export const SaaSTracker = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Key Metrics Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <MetricCard
-                title="Monthly Active Users"
-                current={saasData.currentUsers}
-                goal={saasData.goalUsers}
-                trend={saasData.growthRate}
-              />
-              <MetricCard
-                title="Monthly Revenue"
-                current={saasData.monthlyRevenue}
-                goal={saasData.revenueGoal}
-                prefix="$"
-                trend={15}
-                color="success"
-              />
-              <MetricCard
-                title="Churn Rate"
-                current={saasData.churnRate}
-                goal={2}
-                suffix="%"
-                trend={-2}
-                color="destructive"
-              />
-              <MetricCard
-                title="Growth Rate"
-                current={saasData.growthRate}
-                goal={20}
-                suffix="%"
-                trend={5}
-                color="primary"
-              />
-            </div>
-
-            {/* Progress Visualization */}
+            {/* Enhanced Progress Dashboard */}
+            <ProgressDashboard data={saasData} />
+            
+            {/* Legacy Radial Progress (keeping as alternative visualization) */}
             <div className="grid gap-6 lg:grid-cols-2">
               <Card className="bg-gradient-card border-border/50">
                 <CardHeader>
-                  <CardTitle>User Progress Visualization</CardTitle>
+                  <CardTitle>Classic Progress View</CardTitle>
                 </CardHeader>
                 <CardContent className="flex justify-center">
                   <RadialProgress progress={Math.min(progress, 100)} size={240} />
@@ -293,11 +265,14 @@ export const SaaSTracker = () => {
           </TabsContent>
 
           <TabsContent value="metrics" className="space-y-6">
-            {/* Detailed Metrics */}
+            {/* Advanced Business Metrics */}
+            <AdvancedMetrics data={saasData} />
+            
+            {/* Legacy User & Revenue Metrics (keeping for comparison) */}
             <div className="grid gap-6 md:grid-cols-2">
               <Card className="bg-gradient-card border-border/50">
                 <CardHeader>
-                  <CardTitle>User Metrics</CardTitle>
+                  <CardTitle>Quick User Metrics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4">
@@ -319,7 +294,7 @@ export const SaaSTracker = () => {
 
               <Card className="bg-gradient-card border-border/50">
                 <CardHeader>
-                  <CardTitle>Revenue Metrics</CardTitle>
+                  <CardTitle>Quick Revenue Metrics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4">
@@ -346,7 +321,11 @@ export const SaaSTracker = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
+            {/* Growth Trend Chart */}
             <GrowthChart data={saasData.historicalData} />
+            
+            {/* Advanced Analytics Charts */}
+            <AnalyticsCharts data={saasData} />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
