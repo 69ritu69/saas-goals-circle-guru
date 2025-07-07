@@ -170,15 +170,8 @@ export const SaaSTracker = () => {
     monthlyRevenue: 0,
     revenueGoal: 10000,
     churnRate: 5,
-    growthRate: 10,
-    historicalData: [
-      { month: "Jan", users: 100, revenue: 500 },
-      { month: "Feb", users: 150, revenue: 750 },
-      { month: "Mar", users: 220, revenue: 1100 },
-      { month: "Apr", users: 300, revenue: 1500 },
-      { month: "May", users: 400, revenue: 2000 },
-      { month: "Jun", users: 520, revenue: 2600 },
-    ],
+    growthRate: 15,
+    historicalData: [],
   });
   const [isEditing, setIsEditing] = useState(true);
   const { toast } = useToast();
