@@ -164,20 +164,57 @@ const RadialProgress = ({ progress, size = 200 }: { progress: number; size?: num
 
 export const SaaSTracker = () => {
   const [saasData, setSaasData] = useState<SaaSData>({
-    name: "",
-    currentUsers: 0,
+    name: "My SaaS",
+    currentUsers: 750,
     goalUsers: 1000,
-    monthlyRevenue: 0,
-    revenueGoal: 10000,
-    churnRate: 5,
-    growthRate: 15,
-    historicalData: [],
+    monthlyRevenue: 15000,
+    revenueGoal: 25000,
+    churnRate: 3.5,
+    growthRate: 12,
+    historicalData: [
+      { month: "Jan", users: 450, revenue: 9000 },
+      { month: "Feb", users: 520, revenue: 10400 },
+      { month: "Mar", users: 580, revenue: 11600 },
+      { month: "Apr", users: 640, revenue: 12800 },
+      { month: "May", users: 680, revenue: 13600 },
+      { month: "Jun", users: 750, revenue: 15000 },
+    ],
   });
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
   const progress = saasData.goalUsers > 0 ? (saasData.currentUsers / saasData.goalUsers) * 100 : 0;
   const revenueProgress = saasData.revenueGoal > 0 ? (saasData.monthlyRevenue / saasData.revenueGoal) * 100 : 0;
+
+  // Generate realistic historical data based on current metrics
+  const generateHistoricalData = () => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = new Date().getMonth();
+    const historicalData = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const growthFactor = Math.pow(1 + saasData.growthRate / 100, i + 1);
+      const users = Math.floor(saasData.currentUsers / growthFactor);
+      const revenue = Math.floor(saasData.monthlyRevenue / growthFactor);
+      
+      historicalData.push({
+        month: months[monthIndex],
+        users: Math.max(users, 10),
+        revenue: Math.max(revenue, 100)
+      });
+    }
+    
+    setSaasData(prev => ({
+      ...prev,
+      historicalData
+    }));
+    
+    toast({
+      title: "Historical Data Generated!",
+      description: "Generated 6 months of realistic historical data based on your current metrics.",
+    });
+  };
 
   const handleSave = () => {
     if (saasData.name.trim()) {
@@ -457,9 +494,19 @@ export const SaaSTracker = () => {
                 </div>
 
                 {isEditing && (
-                  <Button onClick={handleSave} className="w-full">
-                    Save Configuration
-                  </Button>
+                  <div className="space-y-3">
+                    <Button onClick={handleSave} className="w-full">
+                      Save Configuration
+                    </Button>
+                    <Button 
+                      onClick={generateHistoricalData} 
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Generate Sample Historical Data
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>

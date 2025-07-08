@@ -9,16 +9,36 @@ interface InsightsPanelProps {
     revenueGoal: number;
     churnRate: number;
     growthRate: number;
+    historicalData: Array<{
+      month: string;
+      users: number;
+      revenue: number;
+    }>;
   };
 }
 
 export const InsightsPanel = ({ data }: InsightsPanelProps) => {
-  const { currentUsers, goalUsers, monthlyRevenue, revenueGoal, churnRate, growthRate } = data;
+  const { currentUsers, goalUsers, monthlyRevenue, revenueGoal, churnRate, growthRate, historicalData } = data;
   
   // Calculate insights
   const timeToGoal = growthRate > 0 ? Math.ceil((goalUsers - currentUsers) / (currentUsers * (growthRate / 100))) : 0;
   const revenuePerUser = currentUsers > 0 ? monthlyRevenue / currentUsers : 0;
   const projectedRevenue = goalUsers * revenuePerUser;
+  
+  // Calculate month-over-month trends if historical data exists
+  const getMonthlyTrend = () => {
+    if (historicalData.length < 2) return { users: 0, revenue: 0 };
+    
+    const lastMonth = historicalData[historicalData.length - 1];
+    const prevMonth = historicalData[historicalData.length - 2];
+    
+    const userTrend = prevMonth.users > 0 ? ((lastMonth.users - prevMonth.users) / prevMonth.users) * 100 : 0;
+    const revenueTrend = prevMonth.revenue > 0 ? ((lastMonth.revenue - prevMonth.revenue) / prevMonth.revenue) * 100 : 0;
+    
+    return { users: Math.round(userTrend * 10) / 10, revenue: Math.round(revenueTrend * 10) / 10 };
+  };
+  
+  const trends = getMonthlyTrend();
   
   const getGrowthStatus = () => {
     if (growthRate >= 10) return { text: "Excellent Growth", color: "bg-success" };
@@ -38,22 +58,25 @@ export const InsightsPanel = ({ data }: InsightsPanelProps) => {
     {
       title: "Time to Goal",
       value: timeToGoal > 0 ? `${timeToGoal} months` : "Set growth rate",
-      description: "At current growth rate"
+      description: "At current growth rate",
+      trend: null
     },
     {
       title: "Revenue per User",
       value: `$${revenuePerUser.toFixed(2)}`,
-      description: "Average monthly revenue"
+      description: "Average monthly revenue",
+      trend: trends.revenue !== 0 ? trends.revenue : null
     },
     {
-      title: "Projected Revenue",
-      value: `$${projectedRevenue.toLocaleString()}`,
-      description: "When goal is reached"
+      title: "Monthly Growth",
+      value: `${trends.users !== 0 ? trends.users : growthRate}%`,
+      description: trends.users !== 0 ? "Actual last month" : "Target growth rate",
+      trend: trends.users !== 0 ? trends.users : null
     },
     {
-      title: "Growth Rate",
+      title: "User Momentum",
       value: `${growthRate}%`,
-      description: "Monthly user growth",
+      description: "Monthly user growth target",
       badge: getGrowthStatus()
     },
     {
@@ -61,6 +84,12 @@ export const InsightsPanel = ({ data }: InsightsPanelProps) => {
       value: `${churnRate}%`,
       description: "Monthly user churn",
       badge: getChurnStatus()
+    },
+    {
+      title: "Revenue Trend",
+      value: `${trends.revenue !== 0 ? (trends.revenue > 0 ? '+' : '') + trends.revenue : 'N/A'}%`,
+      description: trends.revenue !== 0 ? "Last month change" : "No historical data",
+      trend: trends.revenue !== 0 ? trends.revenue : null
     }
   ];
 
@@ -77,7 +106,18 @@ export const InsightsPanel = ({ data }: InsightsPanelProps) => {
               <p className="text-sm text-muted-foreground">{insight.description}</p>
             </div>
             <div className="text-right space-y-1">
-              <p className="text-lg font-bold">{insight.value}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-bold">{insight.value}</p>
+                {insight.trend !== null && insight.trend !== undefined && (
+                  <Badge variant="outline" className={
+                    insight.trend > 0 ? "text-success border-success" : 
+                    insight.trend < 0 ? "text-destructive border-destructive" : 
+                    "text-muted-foreground"
+                  }>
+                    {insight.trend > 0 ? "↗" : insight.trend < 0 ? "↘" : "→"}
+                  </Badge>
+                )}
+              </div>
               {insight.badge && (
                 <Badge className={`${insight.badge.color} text-white`}>
                   {insight.badge.text}

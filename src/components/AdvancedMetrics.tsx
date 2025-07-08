@@ -11,6 +11,11 @@ interface AdvancedMetricsProps {
     revenueGoal: number;
     churnRate: number;
     growthRate: number;
+    historicalData: Array<{
+      month: string;
+      users: number;
+      revenue: number;
+    }>;
   };
 }
 
