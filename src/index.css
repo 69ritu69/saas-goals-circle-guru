@@ -110,3 +110,17 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Screenshot capture styles */
+.screenshot-capture {
+  /* Ensure good contrast and clean appearance for screenshots */
+  background: hsl(var(--background)) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.screenshot-capture * {
+  /* Remove any potential visual artifacts */
+  outline: none !important;
+  box-shadow: none !important;
+}

@@ -13,6 +13,7 @@ import { InsightsPanel } from "./InsightsPanel";
 import { ProgressDashboard } from "./ProgressDashboard";
 import { AdvancedMetrics } from "./AdvancedMetrics";
 import { AnalyticsCharts } from "./AnalyticsCharts";
+import { ScreenshotCapture } from "./ScreenshotCapture";
 
 interface SaaSData {
   name: string;
@@ -268,19 +269,22 @@ export const SaaSTracker = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="metrics">Metrics</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="screenshot">Screenshot</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Enhanced Progress Dashboard */}
-            <ProgressDashboard data={saasData} />
+            <div id="progress-dashboard">
+              <ProgressDashboard data={saasData} />
+            </div>
             
             {/* Legacy Radial Progress (keeping as alternative visualization) */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div id="insights-and-classic" className="grid gap-6 lg:grid-cols-2">
               <Card className="bg-gradient-card border-border/50">
                 <CardHeader>
                   <CardTitle>Classic Progress View</CardTitle>
@@ -296,7 +300,9 @@ export const SaaSTracker = () => {
 
           <TabsContent value="metrics" className="space-y-6">
             {/* Advanced Business Metrics */}
-            <AdvancedMetrics data={saasData} />
+            <div id="advanced-metrics">
+              <AdvancedMetrics data={saasData} />
+            </div>
             
             {/* Legacy User & Revenue Metrics (keeping for comparison) */}
             <div className="grid gap-6 md:grid-cols-2">
@@ -352,10 +358,16 @@ export const SaaSTracker = () => {
 
           <TabsContent value="analytics" className="space-y-6">
             {/* Growth Trend Chart */}
-            <GrowthChart data={saasData.historicalData} />
-            
-            {/* Advanced Analytics Charts */}
-            <AnalyticsCharts data={saasData} />
+            <div id="analytics-charts">
+              <GrowthChart data={saasData.historicalData} />
+              
+              {/* Advanced Analytics Charts */}
+              <AnalyticsCharts data={saasData} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="screenshot" className="space-y-6">
+            <ScreenshotCapture />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
