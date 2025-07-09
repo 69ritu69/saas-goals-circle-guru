@@ -260,10 +260,10 @@ export const SaaSTracker = () => {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            SaaS Growth Tracker
+            SaaS Growth Tracker - Monitor Your Business Metrics
           </h1>
           <p className="text-muted-foreground text-lg">
-            Track your monthly active users and achieve your growth goals
+            Track monthly active users, revenue goals, and business analytics for your SaaS startup. Monitor growth rates, churn metrics, and achieve your business objectives with comprehensive dashboard insights.
           </p>
         </div>
 
@@ -277,6 +277,7 @@ export const SaaSTracker = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Dashboard Overview</h2>
             {/* Enhanced Progress Dashboard */}
             <div id="progress-dashboard">
               <ProgressDashboard data={saasData} />
@@ -298,16 +299,18 @@ export const SaaSTracker = () => {
           </TabsContent>
 
           <TabsContent value="metrics" className="space-y-6">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Business Metrics & KPIs</h2>
             {/* Advanced Business Metrics */}
             <div id="advanced-metrics">
               <AdvancedMetrics data={saasData} />
             </div>
             
+            <h3 className="text-lg font-medium text-foreground mt-6 mb-4">Quick Metrics Summary</h3>
             {/* Legacy User & Revenue Metrics (keeping for comparison) */}
             <div className="grid gap-6 md:grid-cols-2">
               <Card className="bg-gradient-card border-border/50">
                 <CardHeader>
-                  <CardTitle>Quick User Metrics</CardTitle>
+                  <CardTitle>User Engagement Metrics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4">
@@ -356,6 +359,7 @@ export const SaaSTracker = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Growth Analytics & Trends</h2>
             {/* Growth Trend Chart */}
             <div id="analytics-charts">
               <GrowthChart data={saasData.historicalData} />
@@ -365,8 +369,8 @@ export const SaaSTracker = () => {
             </div>
           </TabsContent>
 
-
           <TabsContent value="settings" className="space-y-6">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Configuration & Settings</h2>
             {/* SaaS Configuration Card */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
