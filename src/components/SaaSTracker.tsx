@@ -285,18 +285,12 @@ export const SaaSTracker = () => {
             
             {/* Legacy Radial Progress (keeping as alternative visualization) */}
             <div id="insights-and-classic" className="grid gap-6 lg:grid-cols-2">
-              <Card className="bg-gradient-card border-border/50 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-primary opacity-5"></div>
-                <CardHeader className="text-center relative z-10">
-                  <CardTitle className="text-xl font-semibold bg-gradient-primary bg-clip-text text-transparent">
-                    Classic Progress View
-                  </CardTitle>
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Classic Progress View</CardTitle>
                 </CardHeader>
-                <CardContent className="flex justify-center items-center py-8 relative z-10">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-primary opacity-10 rounded-full blur-2xl scale-150"></div>
-                    <RadialProgress progress={Math.min(progress, 100)} size={280} />
-                  </div>
+                <CardContent className="flex justify-center">
+                  <RadialProgress progress={Math.min(progress, 100)} size={240} />
                 </CardContent>
               </Card>
 
