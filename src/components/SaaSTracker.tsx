@@ -13,7 +13,7 @@ import { InsightsPanel } from "./InsightsPanel";
 import { ProgressDashboard } from "./ProgressDashboard";
 import { AdvancedMetrics } from "./AdvancedMetrics";
 import { AnalyticsCharts } from "./AnalyticsCharts";
-import { ScreenshotCapture } from "./ScreenshotCapture";
+
 
 interface SaaSData {
   name: string;
@@ -269,11 +269,10 @@ export const SaaSTracker = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="metrics">Metrics</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="screenshot">Screenshot</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -366,12 +365,9 @@ export const SaaSTracker = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="screenshot" className="space-y-6">
-            <ScreenshotCapture />
-          </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            {/* Setup Card */}
+            {/* SaaS Configuration Card */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -520,6 +516,138 @@ export const SaaSTracker = () => {
                     </Button>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Display Preferences Card */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Display Preferences</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Currency Symbol</Label>
+                    <select className="w-full px-3 py-2 bg-background border border-border rounded-md">
+                      <option value="$">$ - USD</option>
+                      <option value="€">€ - EUR</option>
+                      <option value="£">£ - GBP</option>
+                      <option value="¥">¥ - JPY</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Number Format</Label>
+                    <select className="w-full px-3 py-2 bg-background border border-border rounded-md">
+                      <option value="en-US">1,234.56 (US)</option>
+                      <option value="en-GB">1,234.56 (UK)</option>
+                      <option value="de-DE">1.234,56 (DE)</option>
+                      <option value="fr-FR">1 234,56 (FR)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Compact Dashboard View</Label>
+                    <input type="checkbox" className="h-4 w-4" />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <Label>Show Animation Effects</Label>
+                    <input type="checkbox" className="h-4 w-4" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <Label>Auto-refresh Data</Label>
+                    <input type="checkbox" className="h-4 w-4" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Goal Tracking Card */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Goal Tracking</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Goal Period</Label>
+                    <select className="w-full px-3 py-2 bg-background border border-border rounded-md">
+                      <option value="monthly">Monthly</option>
+                      <option value="quarterly">Quarterly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Progress Calculation</Label>
+                    <select className="w-full px-3 py-2 bg-background border border-border rounded-md">
+                      <option value="linear">Linear Progress</option>
+                      <option value="weighted">Weighted by Time</option>
+                      <option value="milestone">Milestone Based</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Send Goal Reminders</Label>
+                    <input type="checkbox" className="h-4 w-4" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <Label>Celebrate Milestones</Label>
+                    <input type="checkbox" className="h-4 w-4" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <Label>Weekly Progress Reports</Label>
+                    <input type="checkbox" className="h-4 w-4" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Data Management Card */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Data Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3">
+                  <Button variant="outline" className="w-full justify-start">
+                    Export Dashboard Data (JSON)
+                  </Button>
+                  
+                  <Button variant="outline" className="w-full justify-start">
+                    Export Charts as Images
+                  </Button>
+                  
+                  <Button variant="outline" className="w-full justify-start">
+                    Import Historical Data
+                  </Button>
+                  
+                  <Button variant="destructive" className="w-full justify-start">
+                    Reset All Data
+                  </Button>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Auto-backup Data</Label>
+                      <input type="checkbox" className="h-4 w-4" defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <Label>Sync Across Devices</Label>
+                      <input type="checkbox" className="h-4 w-4" />
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
