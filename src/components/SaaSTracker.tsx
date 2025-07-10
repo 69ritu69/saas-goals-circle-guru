@@ -182,13 +182,11 @@ export const SaaSTracker = () => {
 
 
   const handleSave = () => {
-    if (saasData.name.trim()) {
-      setIsEditing(false);
-      toast({
-        title: "SaaS Details Saved!",
-        description: "Your progress tracking has been updated.",
-      });
-    }
+    setIsEditing(false);
+    toast({
+      title: "SaaS Details Saved!",
+      description: "Your progress tracking has been updated.",
+    });
   };
 
   const handleCopy = () => {
@@ -388,12 +386,12 @@ export const SaaSTracker = () => {
                     <Input
                       id="goal-users"
                       type="number"
-                      placeholder="1000"
+                      placeholder="0"
                       value={saasData.goalUsers}
                       onChange={(e) =>
                         setSaasData({
                           ...saasData,
-                          goalUsers: parseInt(e.target.value) || 1000,
+                          goalUsers: parseInt(e.target.value) || 0,
                         })
                       }
                       disabled={!isEditing}
@@ -422,12 +420,12 @@ export const SaaSTracker = () => {
                     <Input
                       id="revenue-goal"
                       type="number"
-                      placeholder="10000"
+                      placeholder="0"
                       value={saasData.revenueGoal}
                       onChange={(e) =>
                         setSaasData({
                           ...saasData,
-                          revenueGoal: parseInt(e.target.value) || 10000,
+                          revenueGoal: parseInt(e.target.value) || 0,
                         })
                       }
                       disabled={!isEditing}
@@ -439,12 +437,12 @@ export const SaaSTracker = () => {
                     <Input
                       id="churn-rate"
                       type="number"
-                      placeholder="5"
+                      placeholder="0"
                       value={saasData.churnRate}
                       onChange={(e) =>
                         setSaasData({
                           ...saasData,
-                          churnRate: parseInt(e.target.value) || 5,
+                          churnRate: parseInt(e.target.value) || 0,
                         })
                       }
                       disabled={!isEditing}
@@ -456,12 +454,12 @@ export const SaaSTracker = () => {
                     <Input
                       id="growth-rate"
                       type="number"
-                      placeholder="10"
+                      placeholder="0"
                       value={saasData.growthRate}
                       onChange={(e) =>
                         setSaasData({
                           ...saasData,
-                          growthRate: parseInt(e.target.value) || 10,
+                          growthRate: parseInt(e.target.value) || 0,
                         })
                       }
                       disabled={!isEditing}
