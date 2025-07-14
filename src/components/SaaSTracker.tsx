@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Share, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MetricCard } from "./MetricCard";
-import SettingsModal from "./SettingsModal";
+import IntegratedSettingsModal from "./IntegratedSettingsModal";
 import { GrowthChart } from "./GrowthChart";
 import { InsightsPanel } from "./InsightsPanel";
 import { ProgressDashboard } from "./ProgressDashboard";
@@ -176,10 +176,34 @@ export const SaaSTracker = () => {
     historicalData: [],
   });
   const [isEditing, setIsEditing] = useState(true);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const { toast } = useToast();
+
+  // Check if essential details are filled
+  const isEssentialDataEmpty = () => {
+    return (
+      !saasData.name.trim() ||
+      saasData.currentUsers === 0 ||
+      saasData.goalUsers === 0 ||
+      saasData.monthlyRevenue === 0 ||
+      saasData.revenueGoal === 0
+    );
+  };
+
+  // Show settings modal automatically when essential data is empty
+  useEffect(() => {
+    if (isEssentialDataEmpty()) {
+      setShowSettingsModal(true);
+    }
+  }, [saasData]);
 
   const progress = saasData.goalUsers > 0 ? (saasData.currentUsers / saasData.goalUsers) * 100 : 0;
   const revenueProgress = saasData.revenueGoal > 0 ? (saasData.monthlyRevenue / saasData.revenueGoal) * 100 : 0;
+
+  const handleSettingsChange = (newData: SaaSData) => {
+    setSaasData(newData);
+    setShowSettingsModal(false);
+  };
 
 
   const handleSave = () => {
@@ -640,7 +664,6 @@ export const SaaSTracker = () => {
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Text
                 </Button>
-                <SettingsModal />
                 <Button onClick={handleShare} variant="outline" className="flex-1">
                   <Share className="mr-2 h-4 w-4" />
                   Share
@@ -649,6 +672,14 @@ export const SaaSTracker = () => {
             </CardContent>
           </Card>
         )}
+        {/* Integrated Settings Modal - Auto-show when essential data is empty */}
+        <IntegratedSettingsModal 
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          data={saasData}
+          onSave={handleSettingsChange}
+          isRequired={isEssentialDataEmpty()}
+        />
       </div>
     </div>
   );
