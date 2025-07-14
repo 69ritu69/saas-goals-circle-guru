@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Share, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MetricCard } from "./MetricCard";
+import SettingsModal from "./SettingsModal";
 import { GrowthChart } from "./GrowthChart";
 import { InsightsPanel } from "./InsightsPanel";
 import { ProgressDashboard } from "./ProgressDashboard";
@@ -639,6 +640,7 @@ export const SaaSTracker = () => {
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Text
                 </Button>
+                <SettingsModal />
                 <Button onClick={handleShare} variant="outline" className="flex-1">
                   <Share className="mr-2 h-4 w-4" />
                   Share
